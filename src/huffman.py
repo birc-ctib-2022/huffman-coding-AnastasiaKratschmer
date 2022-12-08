@@ -66,6 +66,13 @@ def encoding(x: str) -> Tree:
     hq.heapify(heap)
 
     while len(heap) > 1:
+        first=hq.heappop(heap)
+        second=hq.heappop(heap)
+        new_count=(first.count+second.count)
+        new_node=Node(new_count,second,first)
+        hq.heappush(heap,new_node)
+
+
         # FIXME: get the first two trees from the heap,
         # merge them into one new Node with a count that
         # is the sum of the two trees, and with the two
@@ -75,7 +82,9 @@ def encoding(x: str) -> Tree:
         # or hq.heappush() functions.
         ...
 
+    print(heap)
     return heap.pop()
+    
 
 
 def build_encoding_table(tree: Tree,
@@ -94,8 +103,10 @@ def build_encoding_table(tree: Tree,
     # large trees in an application like this.
     res = res if res is not None else {}
     if isinstance(tree, Leaf):
-        ...
+        res[tree.letter]="".join(bits)
     else:
+        build_encoding_table(tree.left, bits+tuple(["0"]),res)
+        build_encoding_table(tree.right, bits+tuple(["1"]),res)
         ...
     return res
 
@@ -151,6 +162,16 @@ def decode(x: bits, enc: Encoding) -> str:
             # then you move the node to the left or right child
             # based on the bit.
             ...
+            bitss=next(bits)
+            if bitss=='0':
+                node = node.left
+            else:
+                node = node.right
+            
+            if isinstance(node, Leaf):
+                decoding.append(node.letter)
+                node=enc.tree
+
 
     except StopIteration:
         # When we asked for a bit that wasn't there, we end
@@ -179,3 +200,7 @@ class Encoding:
     def decode(self, x: bits) -> str:
         """Decode x according to this encoding."""
         return decode(x, self)
+
+
+encoding("ghghghhgiiiihfusj")
+decode("hj", encoding("hj"))
